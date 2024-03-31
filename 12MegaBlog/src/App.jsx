@@ -4,8 +4,9 @@ import authService from "./appwrite/auth.js";
 import { login, logout } from "./store/authSlice.js";
 import { Header, Footer } from "./components/index.js";
 import { Outlet } from "react-router-dom";
+import conf from "./conf/conf.js";
+
 function App() {
-  console.log(import.meta.env.VITE_APPWRITE_URL);
   const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
 
@@ -13,6 +14,7 @@ function App() {
     authService
       .getCurrentUser()
       .then((userData) => {
+        console.log(userData);
         if (userData) {
           dispatch(login({ userData }));
         } else {
@@ -20,13 +22,15 @@ function App() {
         }
       })
       .finally(() => setLoading(false));
-  }, []);
+  }, [dispatch]);
 
   return !loading ? (
-    <div className="min-h-screen flex flex-wrap content-between bg-gray-500">
+    <div className="min-h-screen flex flex-wrap content-between bg-gray-400">
       <div className="w-full block">
         <Header />
-        <main>TODO: {/*<Outlet />*/} </main>
+        <main>
+          <Outlet />
+        </main>
         <Footer />
       </div>
     </div>

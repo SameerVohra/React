@@ -1,9 +1,11 @@
 import conf from "../conf/conf.js";
-import { ID, Client, Account } from "appwrite";
 
+import { Client, Account, ID } from "appwrite";
+const created = "Account created";
 export class AuthService {
-  client = new Client(); // We made a constructor instead of writing the .setEndpoint and .setProject here, because it will be created bydefault in the class if we write it here and it is a wastage of resources
+  client = new Client();
   account;
+
   constructor() {
     this.client
       .setEndpoint(conf.appWriteURL)
@@ -14,26 +16,29 @@ export class AuthService {
 
   async createAccount({ email, password, name }) {
     try {
+      console.log(`${email}: ${password}: ${name}`);
       const userAccount = await this.account.create(
         ID.unique(),
         email,
         password,
         name,
       );
+      console.log({ created });
       if (userAccount) {
-        //You can call another function
+        // call another method
         return this.login({ email, password });
       } else {
         return userAccount;
       }
     } catch (error) {
+      console.log("create error: ", error);
       throw error;
     }
   }
 
   async login({ email, password }) {
     try {
-      return await this.account.createEmailSession(email, password);
+      return await this.account.createEmailPasswordSession(email, password);
     } catch (error) {
       throw error;
     }
@@ -41,18 +46,20 @@ export class AuthService {
 
   async getCurrentUser() {
     try {
+      console.log("getting user");
       return await this.account.get();
     } catch (error) {
-      throw error;
+      console.log("Appwrite serive :: getCurrentUser :: error", error);
     }
-    return null; //returning null because if we don't get any value
+
+    return null;
   }
 
   async logout() {
     try {
-      return await this.account.deleteSession();
+      await this.account.deleteSessions();
     } catch (error) {
-      throw error;
+      console.log("Appwrite serive :: logout :: error", error);
     }
   }
 }

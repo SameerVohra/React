@@ -9,7 +9,7 @@ import { useState } from "react";
 function Signup() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [register, handleSubmit] = useForm();
+  const { register, handleSubmit } = useForm();
   const [error, setError] = useState("");
 
   const create = async (data) => {
@@ -17,7 +17,7 @@ function Signup() {
     try {
       const userData = await authService.createAccount(data);
       if (userData) dispatch(authLogin(userData));
-      navigate("/");
+      navigate("/login");
     } catch (error) {
       setError(error.message);
     }

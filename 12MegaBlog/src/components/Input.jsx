@@ -14,7 +14,7 @@ const Input = forwardRef(function Input(
   return (
     <div className="w-full">
       {label && (
-        <label className="inline-block pl-1 mb-1" htmlFor={id}>
+        <label className="inline-block pl-1 mb-1 mt-9" htmlFor={id}>
           {label}
         </label>
       )}

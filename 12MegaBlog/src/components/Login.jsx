@@ -2,7 +2,7 @@ import { useDispatch } from "react-redux";
 import { Input, Logo, Button } from "./index";
 import { Link, useNavigate } from "react-router-dom";
 import { login as authLogin } from "../store/authSlice";
-import authService from "../appwrite/auth.js";
+import authService from "../appwrite/auth";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
 
@@ -14,12 +14,13 @@ function Login() {
   const login = async (data) => {
     setError("");
     try {
+      console.log("Logged IN");
       const session = await authService.login(data);
       if (session) {
         const userData = await authService.getCurrentUser();
         if (userData) dispatch(authLogin(userData));
 
-        navigate("/");
+        navigate("/all-posts");
       }
     } catch (error) {
       setError(error.message);
@@ -73,10 +74,10 @@ function Login() {
               required: true,
             })}
           />
+          <Button type="submit" className="w-full">
+            Sign In
+          </Button>
         </form>
-        <Button type="button" className="w-full">
-          Sign In
-        </Button>
       </div>
     </div>
   );
