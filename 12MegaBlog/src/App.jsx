@@ -14,7 +14,6 @@ function App() {
     authService
       .getCurrentUser()
       .then((userData) => {
-        console.log(userData);
         if (userData) {
           dispatch(login({ userData }));
         } else {
@@ -22,7 +21,7 @@ function App() {
         }
       })
       .finally(() => setLoading(false));
-  }, [dispatch]);
+  }, [dispatch, loading]);
 
   return !loading ? (
     <div className="min-h-screen flex flex-wrap content-between bg-gray-400">

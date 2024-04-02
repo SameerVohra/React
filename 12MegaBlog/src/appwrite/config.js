@@ -16,7 +16,7 @@ export class Service {
 
   async createPost({ title, slug, content, featuredImage, status, userId }) {
     try {
-      console.log(`${slug}, ${status}`);
+      const statusBoolean = status === "active" ? true : false;
       return await this.databases.createDocument(
         conf.appWriteDatabaseId,
         conf.appWriteCollectionId,
@@ -25,7 +25,7 @@ export class Service {
           title,
           content,
           featuredImage,
-          status: "active",
+          status: statusBoolean,
           userId,
         },
       );
@@ -35,6 +35,7 @@ export class Service {
   }
 
   async updatePost(slug, { title, content, featuredImage, status }) {
+    const statusBoolean = status === "active" ? true : false;
     try {
       return await this.databases.updateDocument(
         conf.appWriteDatabaseId,
@@ -44,7 +45,7 @@ export class Service {
           title,
           content,
           featuredImage,
-          status,
+          status: statusBoolean,
         },
       );
     } catch (error) {
@@ -67,6 +68,7 @@ export class Service {
   }
 
   async getPost(slug) {
+    console.log("Getting post");
     try {
       return await this.databases.getDocument(
         conf.appWriteDatabaseId,

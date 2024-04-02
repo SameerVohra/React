@@ -16,14 +16,12 @@ export class AuthService {
 
   async createAccount({ email, password, name }) {
     try {
-      console.log(`${email}: ${password}: ${name}`);
       const userAccount = await this.account.create(
         ID.unique(),
         email,
         password,
         name,
       );
-      console.log({ created });
       if (userAccount) {
         // call another method
         return this.login({ email, password });
@@ -46,7 +44,6 @@ export class AuthService {
 
   async getCurrentUser() {
     try {
-      console.log("getting user");
       return await this.account.get();
     } catch (error) {
       console.log("Appwrite serive :: getCurrentUser :: error", error);

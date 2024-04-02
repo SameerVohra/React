@@ -1,7 +1,7 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button, Input, RTE, Select } from "..";
-import appwriteService from "../../appwrite/config";
+import appwriteService from "../../appwrite/config.js";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
@@ -12,28 +12,26 @@ export default function PostForm({ post }) {
         title: post?.title || "",
         slug: post?.$id || "",
         content: post?.content || "",
-        status: post?.status || false,
+        status: post?.status || "active",
       },
     });
 
   const navigate = useNavigate();
-  const userData = useSelector((state) => {
-    console.log(state.auth.userData);
-    state.auth.userData;
-  });
+  const userData = useSelector((state) => state.auth.userData);
+  const [editMode, setEditMode] = useState(!!post);
 
   const submit = async (data) => {
-    console.log("Clicked");
+    console.log(data);
     if (post) {
       const file = data.image[0]
         ? await appwriteService.uploadFile(data.image[0])
         : null;
 
       if (file) {
-        appwriteService.deleteFile(post.featuredImage);
+        appwriteService.deleteFile(file.$id);
       }
 
-      const dbPost = await appwriteService.updatePost(post.$id, {
+      const dbPost = await appwriteService.updatePost(post.documents[0].$id, {
         ...data,
         featuredImage: file ? file.$id : undefined,
       });
@@ -44,10 +42,10 @@ export default function PostForm({ post }) {
     } else {
       const file = await appwriteService.uploadFile(data.image[0]);
 
-      if (file) {
-        console.log("USER ID: ", userData);
+      if (file && file.$id) {
         const fileId = file.$id;
         data.featuredImage = fileId;
+        console.log(userData);
         const dbPost = await appwriteService.createPost({
           ...data,
           userId: userData.$id,
@@ -58,7 +56,15 @@ export default function PostForm({ post }) {
         }
       }
     }
+    setEditMode(true);
   };
+
+  useEffect(() => {
+    if (post && !editMode) {
+      setEditMode(true);
+      console.log(post.title);
+    }
+  }, [post, editMode]);
 
   const slugTransform = useCallback((value) => {
     if (value && typeof value === "string")
@@ -71,7 +77,7 @@ export default function PostForm({ post }) {
     return "";
   }, []);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const subscription = watch((value, { name }) => {
       if (name === "title") {
         setValue("slug", slugTransform(value.title), { shouldValidate: true });
@@ -88,6 +94,8 @@ export default function PostForm({ post }) {
           label="Title :"
           placeholder="Title"
           className="mb-4"
+          //          disabled={!editMode}
+          values={editMode ? post.title : ""}
           {...register("title", { required: true })}
         />
         <Input
@@ -105,7 +113,7 @@ export default function PostForm({ post }) {
           label="Content :"
           name="content"
           control={control}
-          defaultValue={getValues("content")}
+          defaultValue={editMode ? "" : post?.title}
         />
       </div>
       <div className="w-1/3 px-2">
@@ -116,10 +124,15 @@ export default function PostForm({ post }) {
           accept="image/png, image/jpg, image/jpeg, image/gif"
           {...register("image", { required: !post })}
         />
+
         {post && (
           <div className="w-full mb-4">
             <img
-              src={appwriteService.getFilePreview(post.featuredImage)}
+              src={
+                post.featuredImage
+                  ? appwriteService.getFilePreview(post.featuredImage)
+                  : ""
+              }
               alt={post.title}
               className="rounded-lg"
             />
