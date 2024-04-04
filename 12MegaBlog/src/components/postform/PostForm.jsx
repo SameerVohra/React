@@ -28,9 +28,11 @@ export default function PostForm({ post }) {
         : null;
 
       if (file) {
+        console.log(file);
         appwriteService.deleteFile(file.$id);
       }
 
+      console.log(data);
       const dbPost = await appwriteService.updatePost(post.documents[0].$id, {
         ...data,
         featuredImage: file ? file.$id : undefined,
@@ -46,9 +48,15 @@ export default function PostForm({ post }) {
         const fileId = file.$id;
         data.featuredImage = fileId;
         console.log(userData);
+        let userid;
+        if (userData.$id !== undefined) {
+          userid = userData.$id;
+        } else {
+          userid = userData.userData.$id;
+        }
         const dbPost = await appwriteService.createPost({
           ...data,
-          userId: userData.$id,
+          userId: userid,
         });
 
         if (dbPost) {
@@ -95,7 +103,7 @@ export default function PostForm({ post }) {
           placeholder="Title"
           className="mb-4"
           //          disabled={!editMode}
-          values={editMode ? post.title : ""}
+          values={editMode ? post?.title : ""}
           {...register("title", { required: true })}
         />
         <Input

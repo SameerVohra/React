@@ -35,6 +35,7 @@ export class Service {
   }
 
   async updatePost(slug, { title, content, featuredImage, status }) {
+    console.log(slug);
     const statusBoolean = status === "active" ? true : false;
     try {
       return await this.databases.updateDocument(
@@ -54,6 +55,7 @@ export class Service {
   }
 
   async deletePost(slug) {
+    console.log(slug);
     try {
       await this.databases.deleteDocument(
         conf.appWriteDatabaseId,
@@ -68,7 +70,8 @@ export class Service {
   }
 
   async getPost(slug) {
-    console.log("Getting post");
+    console.log("Getting post", slug);
+
     try {
       return await this.databases.getDocument(
         conf.appWriteDatabaseId,
